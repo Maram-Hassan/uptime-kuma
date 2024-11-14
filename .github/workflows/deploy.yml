@@ -36,7 +36,7 @@ jobs:
             echo "Deploying application..."
             PROJECT_DIR="/home/ubuntu/uptime-kuma"
             if [ ! -d "$PROJECT_DIR" ]; then
-            git clone https://github.com/yourusername/your-repo.git $PROJECT_DIR
+            git clone https://github.com/Maram-Hassan/uptime-kuma.git $PROJECT_DIR
             fi          
 
             # Install Node.js and npm (if not already installed)
