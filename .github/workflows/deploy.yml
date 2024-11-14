@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master  # Change this to the branch you are using for deployment
+      - master  # Trigger the workflow when pushing to the master branch
 
 jobs:
   build:
@@ -11,17 +11,13 @@ jobs:
 
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2  # This checks out your code from the GitHub repository
-
-      - name: Install Dependencies
-        run: |
-          echo "Installing dependencies..."
-          npm install
+        uses: actions/checkout@v2  # Checks out your code from the GitHub repository
 
       - name: Build Step
         run: |
           echo "Building..."
-          npm run build
+          npm install  # Install dependencies
+          npm run build  # Build the application
 
   deploy:
     runs-on: ubuntu-latest
@@ -29,19 +25,34 @@ jobs:
 
     steps:
       - name: Deploy to Server
-        uses: appleboy/ssh-action@v0.1.7  # Uses the SSH Action to connect to your server
+        uses: appleboy/ssh-action@v0.1.7  # Uses SSH Action to connect to your server
         with:
           host: ${{ secrets.SERVER_HOST }}  # Your server's IP or domain
-          username: ubuntu
+          username: ubuntu  # Your server username
           key: ${{ secrets.SERVER_KEY }}  # Your private SSH key (ensure it's stored in GitHub secrets)
           port: 22
           script: |
             echo "Deploying application..."
-            # Navigate to the directory where your app is located
-            # cd uptime-kuma
+
+            # Install Node.js and npm (if not already installed)
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -  # Setup Node.js 18.x
+            sudo apt-get install -y nodejs
+
+            # Verify Node.js and npm are installed
+            node -v
+            npm -v
+
+            # Navigate to the project directory
+            cd /path/to/your/project  # Update with your project directory
 
             # Pull the latest changes from the repository
-            # git pull origin master 
+            git pull origin master
 
-            # Run any commands necessary to start/restart your app
-            npm run start  # Start the application 
+            # Install dependencies
+            npm install
+
+            # Build the application
+            npm run build
+
+            # Start the application (use pm2 for production, or npm run start)
+            npm run start &  # Or use pm2 to start the application persistently
