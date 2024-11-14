@@ -36,7 +36,7 @@ jobs:
         uses: appleboy/ssh-action@v0.1.7  # Uses SSH Action to connect to your server
         with:
           host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
+          username: ubuntu
           key: ${{ secrets.SERVER_KEY }}
           port: 22
           script: |
