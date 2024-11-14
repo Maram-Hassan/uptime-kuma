@@ -25,44 +25,42 @@ jobs:
         run: npm run build  # Build your application (make sure to define this script in package.json)
 
   deploy:
-    runs-on: ubuntu-latest
-    needs: build  # Ensures this job runs after the 'build' job finishes
+  runs-on: ubuntu-latest
+  needs: build
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v2
+  steps:
+    - name: Deploy to Server
+      uses: appleboy/ssh-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SERVER_KEY }}
+        port: 22
+        script: |
+          echo "Deploying application..."
+          PROJECT_DIR="/home/ubuntu/my-app"
 
-      - name: Deploy to Server
-        uses: appleboy/ssh-action@v0.1.7  # Uses SSH Action to connect to your server
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ubuntu
-          key: ${{ secrets.SERVER_KEY }}
-          port: 22
-          script: |
-            echo "Deploying application..."
+          # Clone the repository if it doesn’t exist
+          if [ ! -d "$PROJECT_DIR" ]; then
+            git clone https://github.com/yourusername/your-repo.git $PROJECT_DIR
+          fi
 
-            # Navigate to your project directory
-            cd /path/to/your/project  # Change this to your actual project directory on the server
+          # Navigate to the project directory
+          cd $PROJECT_DIR
 
-            # Pull the latest changes from the repository
-            git pull origin master
+          # Pull latest changes
+          git pull origin master
 
-            # Install dependencies
-            npm install
+          # Ensure Node.js is installed
+          if ! command -v node &> /dev/null; then
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+            sudo apt-get install -y nodejs
+          fi
 
-            # Build the application
-            npm run build
+          # Install dependencies and start the application
+          npm install
+          npm run build
+          npm run start
 
-            # Start the application (ensure this runs in the background or as a service)
-            npm run start &  # Adjust the start command if needed for your setup
 
-      - name: Clean up Background Processes
-        run: |
-          pkill -f "npm run start" || true
-          echo "Cleaned up any existing background processes"
-
-      - name: Restart Application
-        run: |
-          nohup npm run start &
-          echo "Application restarted successfully"
+  
