@@ -34,6 +34,10 @@ jobs:
           port: 22
           script: |
             echo "Deploying application..."
+            PROJECT_DIR="/home/ubuntu/my-app"
+            if [ ! -d "$PROJECT_DIR" ]; then
+            git clone https://github.com/yourusername/your-repo.git $PROJECT_DIR
+            fi          
 
             # Install Node.js and npm (if not already installed)
             curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -  # Setup Node.js 18.x
