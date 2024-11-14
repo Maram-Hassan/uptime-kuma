@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master  # Change this to the branch you are using for deployment
+      - main 
 
 jobs:
   build:
@@ -13,11 +13,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2  # This checks out your code from the GitHub repository
 
+      - name: Install Dependencies
+        run: |
+          echo "Installing dependencies..."
+          npm install
 
       - name: Build Step
         run: |
           echo "Building..."
-          # Add build commands
           npm run build
 
   deploy:
@@ -37,7 +40,7 @@ jobs:
             # Navigate to the directory where your app is located
             # cd uptime-kuma
 
-            # # Pull the latest changes from the repository
+            # Pull the latest changes from the repository
             # git pull origin master 
 
             # Run any commands necessary to start/restart your app
