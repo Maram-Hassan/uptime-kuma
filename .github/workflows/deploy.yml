@@ -16,6 +16,7 @@ jobs:
       - name: Build Step
         run: |
           echo "Building..."
+          PROJECT_DIR="/home/ubuntu/uptime-kuma"
           npm install  # Install dependencies
           npm run build  # Build the application
 
@@ -43,8 +44,7 @@ jobs:
             npm -v
 
             # Navigate to the project directory
-            cd /path/to/your/project  # Update with your project directory
-
+            cd $PROJECT_DIR
             # Pull the latest changes from the repository
             git pull origin master
 
