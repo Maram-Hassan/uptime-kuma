@@ -34,7 +34,7 @@ jobs:
           port: 22
           script: |
             echo "Deploying application..."
-            PROJECT_DIR="/home/ubuntu/my-app"
+            PROJECT_DIR="/home/ubuntu/uptime-kuma"
             if [ ! -d "$PROJECT_DIR" ]; then
             git clone https://github.com/yourusername/your-repo.git $PROJECT_DIR
             fi          
