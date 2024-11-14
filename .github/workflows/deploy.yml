@@ -1,0 +1,44 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - master  # Change this to the branch you are using for deployment
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2  # This checks out your code from the GitHub repository
+
+
+      - name: Build Step
+        run: |
+          echo "Building..."
+          # Add build commands
+          npm run build
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build  # Ensures this job runs after the 'build' job finishes
+
+    steps:
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v0.1.7  # Uses the SSH Action to connect to your server
+        with:
+          host: ${{ secrets.SERVER_HOST }}  # Your server's IP or domain
+          username: ubuntu
+          key: ${{ secrets.SERVER_KEY }}  # Your private SSH key (ensure it's stored in GitHub secrets)
+          port: 22
+          script: |
+            echo "Deploying application..."
+            # Navigate to the directory where your app is located
+            # cd uptime-kuma
+
+            # # Pull the latest changes from the repository
+            # git pull origin master 
+
+            # Run any commands necessary to start/restart your app
+            npm run start  # Start the application 
