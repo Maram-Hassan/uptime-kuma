@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master
+      - master  # Change this to your primary branch if needed
 
 jobs:
   build:
@@ -13,35 +13,56 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2  # This checks out your code from the GitHub repository
 
-      - name: Install Dependencies
-        run: |
-          echo "Installing dependencies..."
-          npm install
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'  # Specify your Node.js version
 
-      - name: Build Step
-        run: |
-          echo "Building..."
-          npm run build
+      - name: Install Dependencies
+        run: npm install  # Install all dependencies
+
+      - name: Build Application
+        run: npm run build  # Build your application (make sure to define this script in package.json)
 
   deploy:
     runs-on: ubuntu-latest
     needs: build  # Ensures this job runs after the 'build' job finishes
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
       - name: Deploy to Server
-        uses: appleboy/ssh-action@v0.1.7  # Uses the SSH Action to connect to your server
+        uses: appleboy/ssh-action@v0.1.7  # Uses SSH Action to connect to your server
         with:
-          host: ${{ secrets.SERVER_HOST }}  # Your server's IP or domain
-          username: ubuntu
-          key: ${{ secrets.SERVER_KEY }}  # Your private SSH key (ensure it's stored in GitHub secrets)
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_KEY }}
           port: 22
           script: |
             echo "Deploying application..."
-            # Navigate to the directory where your app is located
-            # cd uptime-kuma
+
+            # Navigate to your project directory
+            cd /path/to/your/project  # Change this to your actual project directory on the server
 
             # Pull the latest changes from the repository
-            # git pull origin master 
+            git pull origin master
 
-            # Run any commands necessary to start/restart your app
-            npm run start  # Start the application 
+            # Install dependencies
+            npm install
+
+            # Build the application
+            npm run build
+
+            # Start the application (ensure this runs in the background or as a service)
+            npm run start &  # Adjust the start command if needed for your setup
+
+      - name: Clean up Background Processes
+        run: |
+          pkill -f "npm run start" || true
+          echo "Cleaned up any existing background processes"
+
+      - name: Restart Application
+        run: |
+          nohup npm run start &
+          echo "Application restarted successfully"
