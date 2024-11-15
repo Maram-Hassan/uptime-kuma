@@ -37,9 +37,9 @@ jobs:
       - name: Deploy to AWS EC2
         uses: appleboy/ssh-action@v0.1.7  # Uses SSH Action to connect to your server
         with:
-          host: ${{ secrets.EC2_HOST }}  # EC2 Public IP address (stored in GitHub Secrets)
+          host: ${{ secrets.SERVER_HOST }}  # EC2 Public IP address (stored in GitHub Secrets)
           username: ubuntu  # Default EC2 user for Ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}  # Private key for SSH (stored in GitHub Secrets)
+          key: ${{ secrets.SERVER_KEY }}  # Private key for SSH (stored in GitHub Secrets)
           port: 22
           script: |
             echo "Deploying application..."
