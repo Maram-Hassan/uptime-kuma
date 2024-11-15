@@ -41,10 +41,12 @@ jobs:
           port: 22
           script: |
             echo "Deploying application..."
+            # Install Node.js and npm if not already installed
+            sudo apt update
+            sudo apt install -y nodejs npm
 
             # Define the project directory
             PROJECT_DIR="/home/ubuntu/uptime-kuma"
-
             # Clone the repository if it does not exist
             if [ ! -d "$PROJECT_DIR" ]; then
               git clone https://github.com/Maram-Hassan/uptime-kuma.git $PROJECT_DIR
@@ -53,13 +55,9 @@ jobs:
             
             # Pull the latest changes from the repository
             git pull origin master
-
             # Run the specified npm commands
             npm cache clean --force
             npm install
             npm install dayjs
-            npm run build
             NODE_OPTIONS="--max-old-space-size=4096" npm run build  # Allocating 4GB of memory
-            npm run start
-
-         
+            npm run start  # Ensure that this line runs the correct start command
