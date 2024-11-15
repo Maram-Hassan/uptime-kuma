@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - master  # Trigger the workflow when pushing to the master branch
+      - master  # Trigger the workflow on pushes to the master branch
 
 jobs:
   build:
@@ -13,11 +13,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2  # Checks out your code from the GitHub repository
 
-      - name: Build Step
+      - name: Install Dependencies
         run: |
-          echo "Building..."
-          PROJECT_DIR="/home/ubuntu/uptime-kuma"
-          npm install  # Install dependencies
+          echo "Updating dependencies..."
+          npm install -g npm-check-updates
+          ncu -u  # Update outdated packages in package.json
+          npm install  # Install updated dependencies
+
+      - name: Build Application
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"  # Increase memory limit to 4GB
+        run: |
+          echo "Building application..."
           npm run build  # Build the application
 
   deploy:
@@ -26,37 +33,41 @@ jobs:
 
     steps:
       - name: Deploy to Server
-        uses: appleboy/ssh-action@v0.1.7  # Uses SSH Action to connect to your server
+        uses: appleboy/ssh-action@v0.1.7  # SSH Action to connect to your server
         with:
-          host: ${{ secrets.SERVER_HOST }}  # Your server's IP or domain
-          username: ubuntu  # Your server username
-          key: ${{ secrets.SERVER_KEY }}  # Your private SSH key (ensure it's stored in GitHub secrets)
+          host: ${{ secrets.SERVER_HOST }}  # Server IP or domain
+          username: ubuntu  # Server username
+          key: ${{ secrets.SERVER_KEY }}  # Private SSH key stored in GitHub secrets
           port: 22
           script: |
             echo "Deploying application..."
+
             PROJECT_DIR="/home/ubuntu/uptime-kuma"
-            if [ ! -d "$PROJECT_DIR" ]; then
+
+            # Remove old project directory if it exists to ensure a clean deployment
+            if [ -d "$PROJECT_DIR" ]; then
+              sudo rm -rf $PROJECT_DIR
+            fi
             git clone https://github.com/Maram-Hassan/uptime-kuma.git $PROJECT_DIR
-            fi          
 
-            # Install Node.js and npm (if not already installed)
-            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -  # Setup Node.js 18.x
+            # Install Node.js and npm if not already installed
+            curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
             sudo apt-get install -y nodejs
-
-            # Verify Node.js and npm are installed
             node -v
             npm -v
 
-            # Navigate to the project directory
+            # Change to project directory
             cd $PROJECT_DIR
-            # Pull the latest changes from the repository
+
+            # Pull latest changes
             git pull origin master
 
-            # Install dependencies
+            # Install dependencies and build
             npm install
+            NODE_OPTIONS="--max-old-space-size=4096" npm run build
 
-            # Build the application
-            npm run build
-
-            # Start the application (use pm2 for production, or npm run start)
-            npm run start &  # Or use pm2 to start the application persistently
+            # Start the application with pm2 for process management
+            sudo npm install -g pm2
+            pm2 delete uptime-kuma || true  # Stop any existing instance
+            pm2 start npm --name "uptime-kuma" -- run start
+            pm2 save  # Save pm2 process list
