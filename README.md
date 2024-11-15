@@ -3,6 +3,11 @@
 </div>
 
 # Uptime Kuma
+# cloud watch service
+![Screenshot from 2024-11-15 10-12-19](https://github.com/user-attachments/assets/2b13a841-bd90-4487-8e9e-7b0213a115f8)
+![Screenshot from 2024-11-15 10-12-57](https://github.com/user-attachments/assets/b0771544-dae1-4e6c-81a2-dd2eeb1fa255)
+# container runing
+![Screenshot from 2024-11-15 10-13-54](https://github.com/user-attachments/assets/98ddc289-5a14-4e68-84f4-555fc9dbdf98)
 
 Uptime Kuma is an easy-to-use self-hosted monitoring tool.
 
