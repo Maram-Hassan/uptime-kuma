@@ -59,6 +59,7 @@ jobs:
             npm install
             npm install dayjs
             npm run build
+            NODE_OPTIONS="--max-old-space-size=4096" npm run build  # Allocating 4GB of memory
             npm run start
 
          
