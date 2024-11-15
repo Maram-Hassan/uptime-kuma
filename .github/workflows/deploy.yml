@@ -43,7 +43,7 @@ jobs:
             echo "Deploying application..."
 
             # Define the project directory
-            PROJECT_DIR="/home/ubuntu/your-project-directory"
+            PROJECT_DIR="/home/ubuntu/uptime-kuma"
 
             # Clone the repository if it does not exist
             if [ ! -d "$PROJECT_DIR" ]; then
