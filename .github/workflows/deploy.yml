@@ -13,9 +13,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v2
 
-    - name: Run a dummy command
-      run: echo "Dummy Docker Image Build & Push Command"
-
   deploy:
     needs: build
     runs-on: ubuntu-latest
